@@ -1,0 +1,108 @@
+# Build output
+build/
+out/
+cmake-build-*/
+**/CMakeFiles/
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/CTestTestfile.cmake
+**/install_manifest.txt
+**/compile_commands.json
+**/CMakeUserPresets.json
+Testing/
+DartConfiguration.tcl
+
+# Ninja / Make
+*.ninja
+.ninja_deps
+.ninja_log
+Makefile
+
+# Compiled objects & binaries
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+*.exp
+*.ilk
+*.pdb
+*.idb
+*.map
+*.dSYM/
+
+# Precompiled headers
+*.gch
+*.pch
+*.ipch
+
+# Shaders / Diligent intermediates (generated)
+*.dxbc
+*.dxil
+*.spv
+*.cso
+
+# IDE / editor
+.vs/
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+*.VC.db
+*.VC.db-shm
+*.VC.db-wal
+*.VC.opendb
+*.opensdf
+*.sdf
+*.code-workspace
+*.swp
+*~
+.clangd/
+.cache/
+
+# CLion / Qt Creator
+cmake-build-debug/
+cmake-build-release/
+CMakeLists.txt.user
+
+# OS junk
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Logs & temp
+*.log
+*.tmp
+*.temp
+*.bak
+core
+core.*
+vgcore.*
+
+# Python (tooling / scripts)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Package / dependency caches (local only; Diligent stays as submodule)
+.conan/
+.vcpkg/
+vcpkg_installed/
