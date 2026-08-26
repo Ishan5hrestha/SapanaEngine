@@ -18,8 +18,18 @@ enum class Action : std::size_t
     MoveDown,
     Look,
     ToggleCursor,
-    ToggleControlMode,
+    ToggleControlMode, // K — cycles camera (Freelook / Chase / FpvNose)
     Thrust,
+    ToggleFlightMode, // L — DJI ↔ FPV
+    /// Drone sticks (Hold.* / Key.Up so WASD ≠ arrows; Diligent maps both to Move*).
+    FlightClimbUp,
+    FlightClimbDown,
+    FlightYawLeft,
+    FlightYawRight,
+    FlightAxisUp,
+    FlightAxisDown,
+    FlightAxisLeft,
+    FlightAxisRight,
     Count
 };
 

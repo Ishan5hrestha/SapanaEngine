@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "$0")" && pwd)"
 BUILD="${ROOT}/build/Linux"
 OUT="${BUILD}/game/sandbox_cube"
 
-cmake --build "${BUILD}" -j"$(nproc)" --target Tutorial02_Cube
+cmake --build "${BUILD}" -j"$(nproc)" --target SapanaSandbox
 
 # Covers JSON-only edits when CMake skips POST_BUILD because nothing recompiled.
 mkdir -p "${OUT}"

@@ -11,17 +11,26 @@ const char* ActionToString(Action action)
 {
     switch (action)
     {
-        case Action::MoveForward:  return "MoveForward";
-        case Action::MoveBackward: return "MoveBackward";
-        case Action::MoveLeft:     return "MoveLeft";
-        case Action::MoveRight:    return "MoveRight";
-        case Action::MoveUp:       return "MoveUp";
-        case Action::MoveDown:     return "MoveDown";
-        case Action::Look:               return "Look";
-        case Action::ToggleCursor:       return "ToggleCursor";
-        case Action::ToggleControlMode:  return "ToggleControlMode";
-        case Action::Thrust:             return "Thrust";
-        case Action::Count:              break;
+        case Action::MoveForward:       return "MoveForward";
+        case Action::MoveBackward:      return "MoveBackward";
+        case Action::MoveLeft:          return "MoveLeft";
+        case Action::MoveRight:         return "MoveRight";
+        case Action::MoveUp:            return "MoveUp";
+        case Action::MoveDown:          return "MoveDown";
+        case Action::Look:              return "Look";
+        case Action::ToggleCursor:      return "ToggleCursor";
+        case Action::ToggleControlMode: return "ToggleControlMode";
+        case Action::Thrust:            return "Thrust";
+        case Action::ToggleFlightMode:  return "ToggleFlightMode";
+        case Action::FlightClimbUp:     return "FlightClimbUp";
+        case Action::FlightClimbDown:   return "FlightClimbDown";
+        case Action::FlightYawLeft:     return "FlightYawLeft";
+        case Action::FlightYawRight:    return "FlightYawRight";
+        case Action::FlightAxisUp:      return "FlightAxisUp";
+        case Action::FlightAxisDown:    return "FlightAxisDown";
+        case Action::FlightAxisLeft:    return "FlightAxisLeft";
+        case Action::FlightAxisRight:   return "FlightAxisRight";
+        case Action::Count:             break;
     }
     return "Unknown";
 }

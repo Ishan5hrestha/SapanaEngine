@@ -1,0 +1,17 @@
+{
+  "default_profile": "dji",
+  "yaw_rate_deg": 90,
+  "pitch_rate_deg": 120,
+  "roll_rate_deg": 120,
+  "max_tilt_deg": 75,
+  "hover_thrust": 1.0,
+  "climb_accel": 12,
+  "heading_accel": 20,
+  "altitude_hold_strength": 8,
+  "motor_arm_m": 0.25,
+  "linear_drag": 2.0,
+  "angular_drag": 4.0,
+  "max_speed": 16,
+  "fpv_thrust_to_weight": 2.5,
+  "rate_gain": 12
+}

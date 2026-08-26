@@ -27,6 +27,15 @@ void InputBindings::ResetToDefaults()
     m_Bindings[static_cast<std::size_t>(Action::ToggleCursor)]      = {"Key.M"};
     m_Bindings[static_cast<std::size_t>(Action::ToggleControlMode)] = {"Key.K"};
     m_Bindings[static_cast<std::size_t>(Action::Thrust)]            = {"Key.Space"};
+    m_Bindings[static_cast<std::size_t>(Action::ToggleFlightMode)]  = {"Key.L"};
+    m_Bindings[static_cast<std::size_t>(Action::FlightClimbUp)]     = {"Hold.W"};
+    m_Bindings[static_cast<std::size_t>(Action::FlightClimbDown)]   = {"Hold.S"};
+    m_Bindings[static_cast<std::size_t>(Action::FlightYawLeft)]     = {"Hold.A"};
+    m_Bindings[static_cast<std::size_t>(Action::FlightYawRight)]    = {"Hold.D"};
+    m_Bindings[static_cast<std::size_t>(Action::FlightAxisUp)]      = {"Key.Up"};
+    m_Bindings[static_cast<std::size_t>(Action::FlightAxisDown)]    = {"Key.Down"};
+    m_Bindings[static_cast<std::size_t>(Action::FlightAxisLeft)]    = {"Key.Left"};
+    m_Bindings[static_cast<std::size_t>(Action::FlightAxisRight)]   = {"Key.Right"};
 }
 
 bool InputBindings::LoadFromFile(const char* path)

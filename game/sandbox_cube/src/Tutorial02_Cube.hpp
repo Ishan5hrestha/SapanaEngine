@@ -31,6 +31,9 @@
 #include "BasicMath.hpp"
 #include "sapana/assets/AssetCache.hpp"
 #include "sapana/camera/Camera.hpp"
+#include "sapana/flight/FlightConfig.hpp"
+#include "sapana/flight/FlightController.hpp"
+#include "sapana/flight/QuadDynamics.hpp"
 #include "sapana/input/CursorController.hpp"
 #include "sapana/input/InputSystem.hpp"
 #include "sapana/render/BasicForwardRenderer.hpp"
@@ -42,7 +45,6 @@
 #include "sapana/render/RenderMode.hpp"
 #include "sapana/render/VisibilityAndLodSystem.hpp"
 #include "sapana/physics/PhysicsSystem.hpp"
-#include "sapana/physics/ForceMotorSystem.hpp"
 
 #include <entt/entt.hpp>
 #include <memory>
@@ -50,10 +52,11 @@
 namespace Diligent
 {
 
-enum class ControlMode
+enum class CameraMode
 {
     Freelook,
-    Drone
+    Chase,
+    FpvNose
 };
 
 class Tutorial02_Cube final : public SampleBase
@@ -68,8 +71,9 @@ public:
 
 private:
     void FindDroneEntity();
-    void EnterDroneMode();
-    void EnterFreelookMode();
+    void CycleCameraMode();
+    void PrintModeLine() const;
+    bool IsDroneCamera() const;
 
     sapana::camera::Camera                 m_Camera;
     sapana::input::InputSystem             m_InputSystem;
@@ -83,16 +87,17 @@ private:
     sapana::render::LodConfig                m_LodConfig;
     sapana::render::VisibilityAndLodSystem   m_VisibilityLod;
     sapana::physics::PhysicsSystem           m_Physics;
-    sapana::physics::ForceMotorSystem      m_ForceMotors;
+    sapana::flight::FlightConfig             m_FlightConfig;
+    sapana::flight::FlightController         m_FlightController;
+    sapana::flight::QuadDynamics             m_QuadDynamics;
     sapana::render::RenderMode             m_RenderMode = sapana::render::RenderMode::Basic;
     entt::registry                         m_Registry;
     float4x4                               m_ViewMatrix;
     float4x4                               m_ProjMatrix;
     float4x4                               m_ViewProjMatrix;
 
-    ControlMode   m_ControlMode  = ControlMode::Freelook;
+    CameraMode    m_CameraMode   = CameraMode::Freelook;
     entt::entity  m_DroneEntity  = entt::null;
-    float         m_DroneYaw     = 0.f;
     float         m_LookSensitivity = 0.003f;
     float         m_PitchLimit   = PI_F / 2.f - 0.01f;
 };

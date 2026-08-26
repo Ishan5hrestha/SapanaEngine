@@ -87,10 +87,20 @@ Simulation is **opt-in** and separate from rendering:
 - Each frame, `PhysicsSystem` steps Jolt and writes **dynamic** poses back into `ecs::Transform` before draw.
 - Public headers never expose Jolt types — see [engine/include/sapana/physics/README.md](engine/include/sapana/physics/README.md).
 
-Sandbox demo: green ground is **static**; cubes are **dynamic** with varied masses; ~40 **static** trees (`meshes/tree_1.glb`) collide but never move; `Gltf_Cube` is visual-only. Entity **Drone** uses a reusable `ForceMotor` (forces + gravity + Space thrust).
+Sandbox demo: green ground is **static**; cubes are **dynamic** with varied masses; ~40 **static** trees (`meshes/tree_1.glb`) collide but never move; `Gltf_Cube` is visual-only. Entity **Drone** uses modular quad flight (`FlightMotor` + `FlightController` / `QuadDynamics`; tunables in `config/flight.json`). FPV uses four virtual motor forces (not per-propeller meshes); DJI stays level with altitude hold.
 
-**Controls (freelook):** WASD + Q/E, mouse look, **M** cursor, **K** drone mode.  
-**Controls (drone):** W/S forward/back, A/D turn, **Space** thrust; mouse does nothing.
+**Controls (freelook):** WASD + Q/E, mouse look, **M** cursor.  
+**K** cycles cameras: Freelook → Chase → FpvNose → Freelook.  
+**L** toggles flight profile: DJI ↔ FPV (persists across cameras).
+
+| Keys | DJI (level) | FPV (acro) |
+|------|-------------|------------|
+| W/S | climb / descend (altitude hold on release) | throttle along body up (idle = fall) |
+| A/D | yaw | yaw rate |
+| ↑/↓ | forward / back (heading frame) | pitch rate (360°, no tilt limit) |
+| ←/→ | strafe (heading frame) | roll rate (360°, no tilt limit) |
+
+Drone sticks apply only in Chase / FpvNose. Both cameras are rigidly parented to the craft.
 
 ## Known issues
 

@@ -106,24 +106,14 @@ void LoadMotorBlock(const nlohmann::json& entJson, entt::entity entity, entt::re
         return;
 
     const auto& m = entJson.at("motor");
-    physics::ForceMotor motor;
-
-    if (m.contains("max_speed") && m.at("max_speed").is_number())
-        motor.MaxSpeed = m.at("max_speed").get<float>();
-    if (m.contains("horizontal_force") && m.at("horizontal_force").is_number())
-        motor.HorizontalForce = m.at("horizontal_force").get<float>();
-    if (m.contains("thrust_force") && m.at("thrust_force").is_number())
-        motor.ThrustForce = m.at("thrust_force").get<float>();
-    if (m.contains("down_force") && m.at("down_force").is_number())
-        motor.DownForce = m.at("down_force").get<float>();
-    if (m.contains("drag") && m.at("drag").is_number())
-        motor.Drag = m.at("drag").get<float>();
+    physics::FlightMotor flight;
     if (m.contains("enabled") && m.at("enabled").is_boolean())
-        motor.Enabled = m.at("enabled").get<bool>();
+        flight.Enabled = m.at("enabled").get<bool>();
 
     for (auto it = m.begin(); it != m.end(); ++it)
     {
         const std::string& key = it.key();
+        // Legacy ForceMotor field names are accepted and ignored (tunables live in flight.json).
         if (key != "max_speed" && key != "horizontal_force" && key != "thrust_force" &&
             key != "down_force" && key != "drag" && key != "enabled")
         {
@@ -131,7 +121,7 @@ void LoadMotorBlock(const nlohmann::json& entJson, entt::entity entity, entt::re
         }
     }
 
-    registry.emplace<physics::ForceMotor>(entity, motor);
+    registry.emplace<physics::FlightMotor>(entity, flight);
 }
 
 } // namespace

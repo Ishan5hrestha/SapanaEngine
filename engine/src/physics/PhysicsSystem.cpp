@@ -286,11 +286,16 @@ void PhysicsSystem::CreateBodies(entt::registry& registry)
             settings.mMassPropertiesOverride.mMass = rigid.Mass;
         }
 
-        // Force-driven bodies: translation only — sample/game code owns yaw via SetRotationDegrees.
-        if (bodyType == BodyType::Dynamic && registry.all_of<ForceMotor>(entity))
+        // ForceMotor: translation only (game snaps yaw). FlightMotor: full 6-DOF quad.
+        if (bodyType == BodyType::Dynamic && registry.all_of<ForceMotor>(entity) &&
+            !registry.all_of<FlightMotor>(entity))
         {
             settings.mAllowedDOFs = JPH::EAllowedDOFs::TranslationX | JPH::EAllowedDOFs::TranslationY |
                                     JPH::EAllowedDOFs::TranslationZ;
+        }
+        else if (bodyType == BodyType::Dynamic && registry.all_of<FlightMotor>(entity))
+        {
+            settings.mAllowedDOFs = JPH::EAllowedDOFs::All;
         }
 
         const JPH::EActivation activation =
@@ -348,8 +353,24 @@ void PhysicsSystem::Update(entt::registry& registry, float elapsedSeconds)
         if (!bodyInterface.IsAdded(joltId))
             continue;
 
-        auto& transform           = view.get<ecs::Transform>(entity);
-        transform.Position        = FromJolt(bodyInterface.GetPosition(joltId));
+        auto& transform    = view.get<ecs::Transform>(entity);
+        transform.Position = FromJolt(bodyInterface.GetPosition(joltId));
+
+        // Flight craft: keep quaternion from Jolt (FPV integrates here; DJI snapped it this frame).
+        if (registry.all_of<FlightMotor>(entity))
+        {
+            auto& motor = registry.get<FlightMotor>(entity);
+            JPH::Quat jq = bodyInterface.GetRotation(joltId);
+            if (!jq.IsNormalized())
+                jq = jq.Normalized();
+            const Diligent::QuaternionF att{jq.GetX(), jq.GetY(), jq.GetZ(), jq.GetW()};
+            motor.Attitude            = att;
+            motor.AttitudeInitialized = true;
+            transform.RotationQuat    = att;
+            transform.UseRotationQuat = true;
+            continue;
+        }
+
         transform.RotationDegrees = QuatToEulerDegrees(bodyInterface.GetRotation(joltId));
     }
 }
@@ -368,7 +389,7 @@ void PhysicsSystem::SetLinearVelocity(BodyId id, const Diligent::float3& velocit
     bodies.ActivateBody(joltId);
 }
 
-void PhysicsSystem::SetRotationDegrees(BodyId id, const Diligent::float3& eulerDegrees)
+void PhysicsSystem::SetRotationDegrees(BodyId id, const Diligent::float3& eulerDegrees, bool resetAngularVelocity)
 {
     if (!IsInitialized() || id == kInvalidBodyId)
         return;
@@ -379,7 +400,24 @@ void PhysicsSystem::SetRotationDegrees(BodyId id, const Diligent::float3& eulerD
         return;
 
     bodies.SetRotation(joltId, EulerDegreesToQuat(eulerDegrees), JPH::EActivation::Activate);
-    bodies.SetAngularVelocity(joltId, JPH::Vec3::sZero());
+    if (resetAngularVelocity)
+        bodies.SetAngularVelocity(joltId, JPH::Vec3::sZero());
+}
+
+void PhysicsSystem::SetRotation(BodyId id, const Diligent::QuaternionF& rotation, bool resetAngularVelocity)
+{
+    if (!IsInitialized() || id == kInvalidBodyId)
+        return;
+
+    const JPH::BodyID joltId(id);
+    JPH::BodyInterface& bodies = m_Impl->World->GetBodyInterface();
+    if (!bodies.IsAdded(joltId))
+        return;
+
+    const JPH::Quat q(rotation.q.x, rotation.q.y, rotation.q.z, rotation.q.w);
+    bodies.SetRotation(joltId, q.IsNormalized() ? q : q.Normalized(), JPH::EActivation::Activate);
+    if (resetAngularVelocity)
+        bodies.SetAngularVelocity(joltId, JPH::Vec3::sZero());
 }
 
 void PhysicsSystem::SetGravityFactor(BodyId id, float factor)
@@ -409,6 +447,34 @@ void PhysicsSystem::AddForce(BodyId id, const Diligent::float3& force)
     bodies.ActivateBody(joltId);
 }
 
+void PhysicsSystem::AddForceAtWorldPoint(BodyId id, const Diligent::float3& force, const Diligent::float3& worldPoint)
+{
+    if (!IsInitialized() || id == kInvalidBodyId)
+        return;
+
+    const JPH::BodyID joltId(id);
+    JPH::BodyInterface& bodies = m_Impl->World->GetBodyInterface();
+    if (!bodies.IsAdded(joltId))
+        return;
+
+    bodies.AddForce(joltId, ToJolt(force), JPH::RVec3(worldPoint.x, worldPoint.y, worldPoint.z));
+    bodies.ActivateBody(joltId);
+}
+
+void PhysicsSystem::AddTorque(BodyId id, const Diligent::float3& torque)
+{
+    if (!IsInitialized() || id == kInvalidBodyId)
+        return;
+
+    const JPH::BodyID joltId(id);
+    JPH::BodyInterface& bodies = m_Impl->World->GetBodyInterface();
+    if (!bodies.IsAdded(joltId))
+        return;
+
+    bodies.AddTorque(joltId, ToJolt(torque));
+    bodies.ActivateBody(joltId);
+}
+
 Diligent::float3 PhysicsSystem::GetLinearVelocity(BodyId id)
 {
     if (!IsInitialized() || id == kInvalidBodyId)
@@ -421,6 +487,63 @@ Diligent::float3 PhysicsSystem::GetLinearVelocity(BodyId id)
 
     const JPH::Vec3 v = bodies.GetLinearVelocity(joltId);
     return Diligent::float3{v.GetX(), v.GetY(), v.GetZ()};
+}
+
+Diligent::float3 PhysicsSystem::GetAngularVelocity(BodyId id)
+{
+    if (!IsInitialized() || id == kInvalidBodyId)
+        return Diligent::float3{0.f, 0.f, 0.f};
+
+    const JPH::BodyID joltId(id);
+    JPH::BodyInterface& bodies = m_Impl->World->GetBodyInterface();
+    if (!bodies.IsAdded(joltId))
+        return Diligent::float3{0.f, 0.f, 0.f};
+
+    const JPH::Vec3 w = bodies.GetAngularVelocity(joltId);
+    return Diligent::float3{w.GetX(), w.GetY(), w.GetZ()};
+}
+
+Diligent::float3 PhysicsSystem::GetPosition(BodyId id)
+{
+    if (!IsInitialized() || id == kInvalidBodyId)
+        return Diligent::float3{0.f, 0.f, 0.f};
+
+    const JPH::BodyID joltId(id);
+    JPH::BodyInterface& bodies = m_Impl->World->GetBodyInterface();
+    if (!bodies.IsAdded(joltId))
+        return Diligent::float3{0.f, 0.f, 0.f};
+
+    return FromJolt(bodies.GetPosition(joltId));
+}
+
+Diligent::QuaternionF PhysicsSystem::GetRotation(BodyId id)
+{
+    if (!IsInitialized() || id == kInvalidBodyId)
+        return Diligent::QuaternionF{0.f, 0.f, 0.f, 1.f};
+
+    const JPH::BodyID joltId(id);
+    JPH::BodyInterface& bodies = m_Impl->World->GetBodyInterface();
+    if (!bodies.IsAdded(joltId))
+        return Diligent::QuaternionF{0.f, 0.f, 0.f, 1.f};
+
+    JPH::Quat q = bodies.GetRotation(joltId);
+    if (!q.IsNormalized())
+        q = q.Normalized();
+    return Diligent::QuaternionF{q.GetX(), q.GetY(), q.GetZ(), q.GetW()};
+}
+
+void PhysicsSystem::SetAngularVelocity(BodyId id, const Diligent::float3& angularVelocity)
+{
+    if (!IsInitialized() || id == kInvalidBodyId)
+        return;
+
+    const JPH::BodyID joltId(id);
+    JPH::BodyInterface& bodies = m_Impl->World->GetBodyInterface();
+    if (!bodies.IsAdded(joltId))
+        return;
+
+    bodies.SetAngularVelocity(joltId, ToJolt(angularVelocity));
+    bodies.ActivateBody(joltId);
 }
 
 } // namespace physics

@@ -63,6 +63,32 @@ bool InputSystem::EvaluateKeyToken(const std::string& token, ImGuiIO* io) const
     if (token == "Key.Space")
         return ImGui::IsKeyDown(ImGuiKey_Space);
 
+    if (token == "Key.Up")
+        return ImGui::IsKeyDown(ImGuiKey_UpArrow);
+    if (token == "Key.Down")
+        return ImGui::IsKeyDown(ImGuiKey_DownArrow);
+    if (token == "Key.Left")
+        return ImGui::IsKeyDown(ImGuiKey_LeftArrow);
+    if (token == "Key.Right")
+        return ImGui::IsKeyDown(ImGuiKey_RightArrow);
+
+    // Hold.X — continuous letter keys (drone WASD), distinct from Diligent W+Arrow aliases.
+    if (token.size() == 6 && token.compare(0, 5, "Hold.") == 0)
+    {
+        const char letter = token[5];
+        if (letter >= 'A' && letter <= 'Z')
+        {
+            const ImGuiKey key = static_cast<ImGuiKey>(ImGuiKey_A + (letter - 'A'));
+            return ImGui::IsKeyDown(key);
+        }
+        if (letter >= 'a' && letter <= 'z')
+        {
+            const ImGuiKey key = static_cast<ImGuiKey>(ImGuiKey_A + (letter - 'a'));
+            return ImGui::IsKeyDown(key);
+        }
+    }
+
+    // Key.X — edge (toggle) letter keys via IsKeyPressed.
     if (token.size() == 5 && token.compare(0, 4, "Key.") == 0)
     {
         const char letter = token[4];
@@ -90,7 +116,7 @@ bool InputSystem::EvaluateDigital(const BindingList& bindings, Diligent::InputCo
             if (key != Diligent::InputKeys::Unknown && controller.IsKeyDown(key))
                 return true;
         }
-        else if (token.compare(0, 4, "Key.") == 0)
+        else if (token.compare(0, 4, "Key.") == 0 || token.compare(0, 5, "Hold.") == 0)
         {
             if (EvaluateKeyToken(token, io))
                 return true;
@@ -157,7 +183,8 @@ void InputSystem::Update(Diligent::InputController& controller, ImGuiIO* io)
             continue;
         }
 
-        if (action == Action::ToggleCursor || action == Action::ToggleControlMode)
+        if (action == Action::ToggleCursor || action == Action::ToggleControlMode ||
+            action == Action::ToggleFlightMode)
         {
             const bool pressed = EvaluateDigital(bindings, controller, io);
             m_WasPressed[i]    = pressed;

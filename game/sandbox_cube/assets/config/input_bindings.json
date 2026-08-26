@@ -8,5 +8,14 @@
   "Look":              ["Mouse.Delta"],
   "ToggleCursor":      ["Key.M"],
   "ToggleControlMode": ["Key.K"],
-  "Thrust":            ["Key.Space"]
+  "Thrust":            ["Key.Space"],
+  "ToggleFlightMode":  ["Key.L"],
+  "FlightClimbUp":     ["Hold.W"],
+  "FlightClimbDown":   ["Hold.S"],
+  "FlightYawLeft":     ["Hold.A"],
+  "FlightYawRight":    ["Hold.D"],
+  "FlightAxisUp":      ["Key.Up"],
+  "FlightAxisDown":    ["Key.Down"],
+  "FlightAxisLeft":    ["Key.Left"],
+  "FlightAxisRight":   ["Key.Right"]
 }

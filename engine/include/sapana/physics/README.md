@@ -15,7 +15,8 @@ Opt-in rigid-body simulation backed by [Jolt Physics](https://github.com/jrouwe/
 | `RigidBody` | Scene JSON | `Static` / `Dynamic` / `Kinematic` (Kinematic reserved → treated as Static in v1) |
 | `Collider` | Scene JSON | `Box` / `Plane` (finite thin box) / `Sphere` (reserved) |
 | `PhysicsBody` | Runtime | Opaque `BodyId` created by `PhysicsSystem::CreateBodies` |
-| `ForceMotor` | Scene JSON `motor` | Reusable force drive (thrust, horizontal force, drag, max speed) |
+| `ForceMotor` | Optional | Translation-only tank/simple props (not used by sandbox drone) |
+| `FlightMotor` | Scene JSON `motor` | Full 6-DOF quad. DJI: game-owned level attitude. FPV: Jolt + 4 motor forces. |
 
 ## Scene JSON
 
@@ -29,40 +30,31 @@ Opt-in rigid-body simulation backed by [Jolt Physics](https://github.com/jrouwe/
   "half_extents": [1, 1, 1]
 },
 "motor": {
-  "max_speed": 8,
-  "horizontal_force": 25,
-  "thrust_force": 40,
-  "down_force": 15,
-  "drag": 2
+  "enabled": true
 }
 ```
 
-If `half_extents` is omitted or zero, extents are derived from `Transform.scale` (builtin cube spans `[-1,1]`, so scale is half-extent; plane uses scale XZ and a thin Y).
+Legacy motor force fields in scene JSON are ignored; flight tunables live in `config/flight.json`.
 
-Entities without `motor` are not force-driven. **Mass ratios matter**: light props nudge easily; heavy boxes barely move under limited motor force.
+If `half_extents` is omitted or zero, extents are derived from `Transform.scale`.
 
-## Config (`config/physics.json`)
+## Config
 
-```json
-{ "gravity": [0, -9.81, 0], "fixed_dt": 0.0166667, "max_substeps": 5 }
-```
+- `config/physics.json` — gravity, fixed_dt
+- `config/flight.json` — DJI/FPV rates, hover, altitude hold, drag, max tilt
 
-Missing file → engine defaults (same values).
-
-## Frame loop
+## Frame loop (drone)
 
 1. `Initialize(config)` once  
-2. `CreateBodies(registry)` after scene load  
-3. Each frame (driven bodies):
-   - Aim: `SetRotationDegrees` (clears angular velocity)
-   - `ForceMotorSystem::SetInput` → `Update` (AddForce + drag) **before** `PhysicsSystem::Update`
-   - `PhysicsSystem::Update` → dynamic poses overwrite `ecs::Transform`
-   - `ForceMotorSystem::ClampSpeeds` after integrate  
-4. Render reads `Transform` as usual  
+2. `CreateBodies(registry)` after scene load (`FlightMotor` → full DOFs)  
+3. Each frame (Chase / FpvNose):
+   - `FlightController::BuildCommand` → `QuadDynamics::Apply` **before** `PhysicsSystem::Update`
+     - **DJI:** snap level attitude, world-up hover, altitude hold
+     - **FPV:** four motor forces at arm corners along body up (idle = 0, gravity wins); rate PID torques; no `SetRotation`
+   - `PhysicsSystem::Update` writes position + quaternion into `FlightMotor::Attitude`
+4. Cameras parent to `FlightMotor::Attitude`
 
-API helpers: `AddForce`, `GetLinearVelocity`, `SetLinearVelocity` (hard stops / speed clamp only — not per-frame flight).
-
-Sandbox drone uses **gravity factor 1** and Space thrust (`Action::Thrust`); release Space to fall.
+API helpers: `AddForce`, `AddTorque`, `Get/SetLinearVelocity`, `Get/SetAngularVelocity`, `SetRotationDegrees(..., resetAngularVelocity)`.
 
 ## Extension roadmap (not in v1)
 
@@ -72,4 +64,4 @@ Sandbox drone uses **gravity factor 1** and Space thrust (`Action::Thrust`); rel
 - Extra collision layers (triggers, projectiles)  
 - Constraints / ragdolls  
 - Kinematic platforms  
-- PID altitude hold / helicopter visuals  
+- Per-propeller visuals  

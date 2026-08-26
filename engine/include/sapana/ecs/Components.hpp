@@ -25,16 +25,25 @@ struct Transform
     float3 Position{0.f, 0.f, 0.f};
     float3 RotationDegrees{0.f, 0.f, 0.f};
     float3 Scale{1.f, 1.f, 1.f};
+    /// When true, ToMatrix uses RotationQuat (same orientation the drone camera parents to).
+    Diligent::QuaternionF RotationQuat{0.f, 0.f, 0.f, 1.f};
+    bool                  UseRotationQuat = false;
 
     float4x4 ToMatrix() const
     {
-        const float rx = RotationDegrees.x * (PI_F / 180.f);
-        const float ry = RotationDegrees.y * (PI_F / 180.f);
-        const float rz = RotationDegrees.z * (PI_F / 180.f);
-
         const float4x4 scale = float4x4::Scale(Scale.x, Scale.y, Scale.z);
-        const float4x4 rot =
-            float4x4::RotationX(rx) * float4x4::RotationY(ry) * float4x4::RotationZ(rz);
+        float4x4       rot;
+        if (UseRotationQuat)
+        {
+            rot = RotationQuat.ToMatrix();
+        }
+        else
+        {
+            const float rx = RotationDegrees.x * (PI_F / 180.f);
+            const float ry = RotationDegrees.y * (PI_F / 180.f);
+            const float rz = RotationDegrees.z * (PI_F / 180.f);
+            rot            = float4x4::RotationX(rx) * float4x4::RotationY(ry) * float4x4::RotationZ(rz);
+        }
         const float4x4 trans = float4x4::Translation(Position.x, Position.y, Position.z);
         return scale * rot * trans;
     }

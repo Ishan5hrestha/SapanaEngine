@@ -30,6 +30,7 @@
 #include "ColorConversion.h"
 #include "sapana/camera/CameraConfig.hpp"
 #include "sapana/ecs/Components.hpp"
+#include "sapana/flight/FlightTypes.hpp"
 #include "sapana/physics/PhysicsComponents.hpp"
 #include "sapana/physics/PhysicsConfig.hpp"
 #include "sapana/render/LightingConfig.hpp"
@@ -49,10 +50,33 @@ namespace Diligent
 namespace
 {
 
-constexpr float kAttachBack  = 3.5f;  // meters behind drone (local -Z)
-constexpr float kAttachUp    = 1.2f;  // meters above drone
-constexpr float kAttachPitch = -0.28f; // slight look-down (matches freelook Camera pitch sign)
-constexpr float kDroneYawRate = 2.2f; // rad/s for A/D turn
+constexpr float kAttachBack  = 3.5f;
+constexpr float kAttachUp    = 1.2f;
+constexpr float kAttachPitch = -0.28f;
+constexpr float kNoseForward = 0.35f;
+constexpr float kNoseUp      = 0.12f;
+
+using QuaternionF = Diligent::QuaternionF;
+
+/// Rigid child of the drone: eye = dronePos + attitude * localOffset.
+/// View rotation is the inverse of the drone attitude (plus a fixed local look-down).
+float4x4 MakeRigidAttachedView(const float3&      dronePos,
+                               const QuaternionF& attitude,
+                               const float3&      localOffset,
+                               float              extraPitchRad)
+{
+    const float3   eye           = dronePos + attitude.RotateVector(localOffset);
+    const float4x4 worldFromBody = attitude.ToMatrix();
+    float4x4       view          = float4x4::Translation(-eye) * worldFromBody.Transpose();
+    if (extraPitchRad != 0.f)
+        view = view * float4x4::RotationX(extraPitchRad);
+    return view;
+}
+
+float3 RigidEyePosition(const float3& dronePos, const QuaternionF& attitude, const float3& localOffset)
+{
+    return dronePos + attitude.RotateVector(localOffset);
+}
 
 sapana::render::RenderMode LoadRenderMode(const char* path)
 {
@@ -78,18 +102,42 @@ sapana::render::RenderMode LoadRenderMode(const char* path)
     return sapana::render::RenderMode::Basic;
 }
 
-/// Camera rigidly parented to the drone: fixed local offset, same yaw/facing as the craft.
-/// No independent look-at — when the drone turns, the camera turns with it.
-float4x4 MakeDroneAttachedView(const float3& dronePos, float yaw)
+const char* CameraModeName(CameraMode mode)
 {
-    // Local (+X right, +Y up, +Z forward) → world, same basis as ForceMotor.
-    const float3 localOffset{0.f, kAttachUp, -kAttachBack};
-    const float3 worldOffset = localOffset * float4x4::RotationY(yaw).Transpose();
-    const float3 eye         = dronePos + worldOffset;
+    switch (mode)
+    {
+        case CameraMode::Freelook: return "Freelook";
+        case CameraMode::Chase:    return "Chase";
+        case CameraMode::FpvNose:  return "FpvNose";
+    }
+    return "Unknown";
+}
 
-    // Same construction as sapana::camera::Camera::UpdateViewMatrix.
-    const float4x4 cameraRotation = float4x4::RotationY(yaw) * float4x4::RotationX(kAttachPitch);
-    return float4x4::Translation(-eye) * cameraRotation;
+const char* FlightProfileName(sapana::flight::FlightProfile profile)
+{
+    return (profile == sapana::flight::FlightProfile::FPV) ? "FPV" : "DJI";
+}
+
+float4x4 MakeChaseView(const float3& dronePos, const QuaternionF& attitude)
+{
+    const float3 localOffset{0.f, kAttachUp, -kAttachBack};
+    return MakeRigidAttachedView(dronePos, attitude, localOffset, kAttachPitch);
+}
+
+float4x4 MakeFpvNoseView(const float3& dronePos, const QuaternionF& attitude)
+{
+    const float3 localOffset{0.f, kNoseUp, kNoseForward};
+    return MakeRigidAttachedView(dronePos, attitude, localOffset, 0.f);
+}
+
+float3 ChaseEyePosition(const float3& dronePos, const QuaternionF& attitude)
+{
+    return RigidEyePosition(dronePos, attitude, float3{0.f, kAttachUp, -kAttachBack});
+}
+
+float3 NoseEyePosition(const float3& dronePos, const QuaternionF& attitude)
+{
+    return RigidEyePosition(dronePos, attitude, float3{0.f, kNoseUp, kNoseForward});
 }
 
 } // namespace
@@ -113,36 +161,43 @@ void Tutorial02_Cube::FindDroneEntity()
     }
 }
 
-void Tutorial02_Cube::EnterDroneMode()
+bool Tutorial02_Cube::IsDroneCamera() const
+{
+    return m_CameraMode == CameraMode::Chase || m_CameraMode == CameraMode::FpvNose;
+}
+
+void Tutorial02_Cube::PrintModeLine() const
+{
+    std::cerr << "Sapana: camera=" << CameraModeName(m_CameraMode)
+              << " flight=" << FlightProfileName(m_FlightController.GetProfile())
+              << " (K cycle cam, L toggle DJI/FPV)\n";
+}
+
+void Tutorial02_Cube::CycleCameraMode()
 {
     if (m_DroneEntity == entt::null || !m_Registry.valid(m_DroneEntity))
     {
-        std::cerr << "Sapana: cannot enter drone mode (Drone entity missing)\n";
+        std::cerr << "Sapana: cannot cycle drone cameras (Drone entity missing)\n";
         return;
     }
 
-    m_ControlMode = ControlMode::Drone;
-    if (m_Registry.all_of<sapana::ecs::Transform>(m_DroneEntity))
+    switch (m_CameraMode)
     {
-        const auto& t = m_Registry.get<sapana::ecs::Transform>(m_DroneEntity);
-        m_DroneYaw    = t.RotationDegrees.y * (PI_F / 180.f);
+        case CameraMode::Freelook:
+            m_CameraMode = CameraMode::Chase;
+            break;
+        case CameraMode::Chase:
+            m_CameraMode = CameraMode::FpvNose;
+            break;
+        case CameraMode::FpvNose:
+            m_CameraMode = CameraMode::Freelook;
+            if (m_Registry.all_of<sapana::physics::FlightMotor>(m_DroneEntity))
+                m_Registry.get<sapana::physics::FlightMotor>(m_DroneEntity).HoldAltitudeActive = false;
+            break;
     }
-    m_InputSystem.SuppressLookFrames(1);
-    std::cerr << "Sapana: control mode = Drone (chase cam). Press K for freelook.\n";
-}
 
-void Tutorial02_Cube::EnterFreelookMode()
-{
-    m_ControlMode = ControlMode::Freelook;
-    if (m_DroneEntity != entt::null && m_Registry.valid(m_DroneEntity) &&
-        m_Registry.all_of<sapana::physics::PhysicsBody>(m_DroneEntity))
-    {
-        // Stop residual velocity when leaving drone control.
-        const auto id = m_Registry.get<sapana::physics::PhysicsBody>(m_DroneEntity).Id;
-        m_Physics.SetLinearVelocity(id, float3{0.f, 0.f, 0.f});
-    }
     m_InputSystem.SuppressLookFrames(1);
-    std::cerr << "Sapana: control mode = Freelook. Press K for drone.\n";
+    PrintModeLine();
 }
 
 void Tutorial02_Cube::Initialize(const SampleInitInfo& InitInfo)
@@ -209,7 +264,14 @@ void Tutorial02_Cube::Initialize(const SampleInitInfo& InitInfo)
 
     FindDroneEntity();
     if (m_DroneEntity == entt::null)
-        std::cerr << "Sapana: scene has no entity named Drone; K toggle disabled\n";
+        std::cerr << "Sapana: scene has no entity named Drone; K camera cycle limited\n";
+
+    if (!m_FlightConfig.LoadFromFile("config/flight.json"))
+    {
+        std::cerr << "Sapana: using default flight config (config/flight.json missing or invalid)\n";
+    }
+    m_FlightController.SetProfile(m_FlightConfig.DefaultProfile);
+    m_QuadDynamics.ApplyConfig(m_FlightConfig);
 
     sapana::physics::PhysicsConfig physicsConfig;
     if (!physicsConfig.LoadFromFile("config/physics.json"))
@@ -234,7 +296,6 @@ void Tutorial02_Cube::Initialize(const SampleInitInfo& InitInfo)
     }
     m_Camera.ApplyConfig(cameraConfig);
 
-    // Keep GPU far clip beyond CPU far-cull so meshes are removed whole, not sliced by the far plane.
     if (m_LodConfig.Enabled)
     {
         constexpr float kFarPlaneMargin = 50.f;
@@ -260,7 +321,7 @@ void Tutorial02_Cube::Initialize(const SampleInitInfo& InitInfo)
     m_CursorController.Initialize();
     m_CursorController.SetMode(sapana::input::CursorMode::Captured);
     m_InputSystem.SuppressLookFrames(1);
-    std::cerr << "Sapana: control mode = Freelook. Press K for drone chase.\n";
+    PrintModeLine();
 }
 
 void Tutorial02_Cube::Render()
@@ -268,7 +329,6 @@ void Tutorial02_Cube::Render()
     ITextureView* pRTV = m_pSwapChain->GetCurrentBackBufferRTV();
     ITextureView* pDSV = m_pSwapChain->GetDepthBufferDSV();
 
-    // Shadow pass (offscreen) before main color targets.
     if (m_ShadowSystem.IsEnabled())
     {
         const float3 lightDir = m_LightingConfig.Lights.empty()
@@ -288,7 +348,6 @@ void Tutorial02_Cube::Render()
         m_BasicRenderer.SetShadowResources(nullptr, float4x4::Identity(), false);
     }
 
-    // Restore main render targets after shadow cascades.
     m_pImmediateContext->SetRenderTargets(1, &pRTV, pDSV, RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
 
     float4 ClearColor = m_LightingConfig.ClearColor;
@@ -341,18 +400,20 @@ void Tutorial02_Cube::Update(double CurrTime, double ElapsedTime, bool DoUpdateU
     }
 
     if (m_InputSystem.WasPressed(sapana::input::Action::ToggleControlMode))
+        CycleCameraMode();
+
+    // L toggles flight profile anytime (persists); printed when drone cams active too.
+    if (m_InputSystem.WasPressed(sapana::input::Action::ToggleFlightMode))
     {
-        if (m_ControlMode == ControlMode::Freelook)
-            EnterDroneMode();
-        else
-            EnterFreelookMode();
+        m_FlightController.ToggleProfile();
+        PrintModeLine();
     }
 
     if (m_CursorController.IsCaptured())
     {
         const auto look = m_InputSystem.GetLookDelta();
 
-        if (m_ControlMode == ControlMode::Freelook)
+        if (m_CameraMode == CameraMode::Freelook)
         {
             float3 moveDir{0.f, 0.f, 0.f};
             if (m_InputSystem.IsDown(sapana::input::Action::MoveForward))
@@ -371,31 +432,12 @@ void Tutorial02_Cube::Update(double CurrTime, double ElapsedTime, bool DoUpdateU
             m_Camera.Move(moveDir, dt);
             m_Camera.LookPixels(look.x, look.y);
         }
-        else if (m_DroneEntity != entt::null && m_Registry.valid(m_DroneEntity) &&
-                 m_Registry.all_of<sapana::physics::PhysicsBody>(m_DroneEntity))
+        else if (IsDroneCamera() && m_DroneEntity != entt::null && m_Registry.valid(m_DroneEntity) &&
+                 m_Registry.all_of<sapana::physics::PhysicsBody, sapana::physics::FlightMotor>(m_DroneEntity))
         {
-            // Tank-style: A/D yaw the drone body, W/S thrust along facing; Space lift only.
-            // Mouse look is ignored in drone mode.
-            if (m_InputSystem.IsDown(sapana::input::Action::MoveLeft))
-                m_DroneYaw += kDroneYawRate * dt;
-            if (m_InputSystem.IsDown(sapana::input::Action::MoveRight))
-                m_DroneYaw -= kDroneYawRate * dt;
-
-            float3 localMove{0.f, 0.f, 0.f};
-            if (m_InputSystem.IsDown(sapana::input::Action::MoveForward))
-                localMove.z += 1.f;
-            if (m_InputSystem.IsDown(sapana::input::Action::MoveBackward))
-                localMove.z -= 1.f;
-
-            const float yawDegrees = m_DroneYaw * (180.f / PI_F);
-            const auto  bodyId     = m_Registry.get<sapana::physics::PhysicsBody>(m_DroneEntity).Id;
-            m_Physics.SetRotationDegrees(bodyId, float3{0.f, yawDegrees, 0.f});
-            if (m_Registry.all_of<sapana::ecs::Transform>(m_DroneEntity))
-                m_Registry.get<sapana::ecs::Transform>(m_DroneEntity).RotationDegrees =
-                    float3{0.f, yawDegrees, 0.f};
-
-            const bool thrust = m_InputSystem.IsDown(sapana::input::Action::Thrust);
-            m_ForceMotors.SetInput(m_DroneEntity, localMove, m_DroneYaw, thrust, true);
+            const sapana::flight::FlightCommand cmd =
+                m_FlightController.BuildCommand(m_InputSystem, m_FlightConfig);
+            m_QuadDynamics.Apply(m_Registry, m_Physics, m_DroneEntity, cmd, dt);
         }
 
         if (look.x != 0.f || look.y != 0.f)
@@ -404,37 +446,22 @@ void Tutorial02_Cube::Update(double CurrTime, double ElapsedTime, bool DoUpdateU
             m_InputSystem.NotifyPointerWarped();
         }
     }
-    else if (m_ControlMode == ControlMode::Drone && m_DroneEntity != entt::null)
-    {
-        // Cursor free: no motor drive; gravity + drag still apply.
-        m_ForceMotors.ClearInput(m_DroneEntity);
-    }
 
     if (m_Physics.IsInitialized())
-    {
-        m_ForceMotors.Update(m_Registry, m_Physics);
         m_Physics.Update(m_Registry, dt);
-        m_ForceMotors.ClampSpeeds(m_Registry, m_Physics);
-    }
-
-    // Keep authored yaw on the drone after physics sync (euler extraction can drift).
-    if (m_ControlMode == ControlMode::Drone && m_DroneEntity != entt::null &&
-        m_Registry.valid(m_DroneEntity) &&
-        m_Registry.all_of<sapana::ecs::Transform, sapana::physics::PhysicsBody>(m_DroneEntity))
-    {
-        const float yawDegrees = m_DroneYaw * (180.f / PI_F);
-        m_Registry.get<sapana::ecs::Transform>(m_DroneEntity).RotationDegrees =
-            float3{0.f, yawDegrees, 0.f};
-        m_Physics.SetRotationDegrees(m_Registry.get<sapana::physics::PhysicsBody>(m_DroneEntity).Id,
-                                     float3{0.f, yawDegrees, 0.f});
-    }
 
     float4x4 View;
-    if (m_ControlMode == ControlMode::Drone && m_DroneEntity != entt::null &&
-        m_Registry.valid(m_DroneEntity) && m_Registry.all_of<sapana::ecs::Transform>(m_DroneEntity))
+    if (IsDroneCamera() && m_DroneEntity != entt::null && m_Registry.valid(m_DroneEntity) &&
+        m_Registry.all_of<sapana::ecs::Transform, sapana::physics::FlightMotor>(m_DroneEntity))
     {
-        const auto& t = m_Registry.get<sapana::ecs::Transform>(m_DroneEntity);
-        View          = MakeDroneAttachedView(t.Position, m_DroneYaw);
+        const auto& t     = m_Registry.get<sapana::ecs::Transform>(m_DroneEntity);
+        const auto& motor = m_Registry.get<sapana::physics::FlightMotor>(m_DroneEntity);
+        const QuaternionF attitude =
+            motor.AttitudeInitialized ? motor.Attitude : QuaternionF{0.f, 0.f, 0.f, 1.f};
+        if (m_CameraMode == CameraMode::FpvNose)
+            View = MakeFpvNoseView(t.Position, attitude);
+        else
+            View = MakeChaseView(t.Position, attitude);
     }
     else
     {
@@ -449,14 +476,17 @@ void Tutorial02_Cube::Update(double CurrTime, double ElapsedTime, bool DoUpdateU
     m_ViewProjMatrix               = m_ViewMatrix * m_ProjMatrix;
 
     float3 cameraPos{0.f, 0.f, 0.f};
-    if (m_ControlMode == ControlMode::Drone && m_DroneEntity != entt::null &&
-        m_Registry.valid(m_DroneEntity) && m_Registry.all_of<sapana::ecs::Transform>(m_DroneEntity))
+    if (IsDroneCamera() && m_DroneEntity != entt::null && m_Registry.valid(m_DroneEntity) &&
+        m_Registry.all_of<sapana::ecs::Transform, sapana::physics::FlightMotor>(m_DroneEntity))
     {
-        // Approximate eye from drone-attached view (same offset as MakeDroneAttachedView).
-        const auto& t = m_Registry.get<sapana::ecs::Transform>(m_DroneEntity);
-        const float3 localOffset{0.f, kAttachUp, -kAttachBack};
-        const float3 worldOffset = localOffset * float4x4::RotationY(m_DroneYaw).Transpose();
-        cameraPos                = t.Position + worldOffset;
+        const auto& t     = m_Registry.get<sapana::ecs::Transform>(m_DroneEntity);
+        const auto& motor = m_Registry.get<sapana::physics::FlightMotor>(m_DroneEntity);
+        const QuaternionF attitude =
+            motor.AttitudeInitialized ? motor.Attitude : QuaternionF{0.f, 0.f, 0.f, 1.f};
+        if (m_CameraMode == CameraMode::FpvNose)
+            cameraPos = NoseEyePosition(t.Position, attitude);
+        else
+            cameraPos = ChaseEyePosition(t.Position, attitude);
     }
     else
     {

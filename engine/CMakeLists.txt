@@ -47,6 +47,9 @@ add_library(SapanaEngine STATIC
     src/physics/PhysicsConfig.cpp
     src/physics/PhysicsSystem.cpp
     src/physics/ForceMotorSystem.cpp
+    src/flight/FlightConfig.cpp
+    src/flight/FlightController.cpp
+    src/flight/QuadDynamics.cpp
 )
 
 target_include_directories(SapanaEngine
