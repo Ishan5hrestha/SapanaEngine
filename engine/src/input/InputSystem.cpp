@@ -154,7 +154,7 @@ void InputSystem::Update(Diligent::InputController& controller, ImGuiIO* io)
             continue;
         }
 
-        if (action == Action::ToggleCursor)
+        if (action == Action::ToggleCursor || action == Action::ToggleControlMode)
         {
             const bool pressed = EvaluateDigital(bindings, controller, io);
             m_WasPressed[i]    = pressed;

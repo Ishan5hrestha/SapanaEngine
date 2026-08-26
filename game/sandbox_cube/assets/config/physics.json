@@ -1,0 +1,5 @@
+{
+  "gravity": [0, -9.81, 0],
+  "fixed_dt": 0.0166667,
+  "max_substeps": 5
+}

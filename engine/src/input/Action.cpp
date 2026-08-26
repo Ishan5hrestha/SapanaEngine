@@ -17,9 +17,10 @@ const char* ActionToString(Action action)
         case Action::MoveRight:    return "MoveRight";
         case Action::MoveUp:       return "MoveUp";
         case Action::MoveDown:     return "MoveDown";
-        case Action::Look:         return "Look";
-        case Action::ToggleCursor: return "ToggleCursor";
-        case Action::Count:        break;
+        case Action::Look:               return "Look";
+        case Action::ToggleCursor:       return "ToggleCursor";
+        case Action::ToggleControlMode:  return "ToggleControlMode";
+        case Action::Count:              break;
     }
     return "Unknown";
 }

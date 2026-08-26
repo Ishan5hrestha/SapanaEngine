@@ -29,12 +29,26 @@
 
 #include "SampleBase.hpp"
 #include "BasicMath.hpp"
+#include "sapana/assets/AssetCache.hpp"
 #include "sapana/camera/Camera.hpp"
 #include "sapana/input/CursorController.hpp"
 #include "sapana/input/InputSystem.hpp"
+#include "sapana/render/BasicForwardRenderer.hpp"
+#include "sapana/render/PbrGltfRenderer.hpp"
+#include "sapana/render/RenderMode.hpp"
+#include "sapana/physics/PhysicsSystem.hpp"
+
+#include <entt/entt.hpp>
+#include <memory>
 
 namespace Diligent
 {
+
+enum class ControlMode
+{
+    Freelook,
+    Drone
+};
 
 class Tutorial02_Cube final : public SampleBase
 {
@@ -44,23 +58,33 @@ public:
     virtual void Render() override final;
     virtual void Update(double CurrTime, double ElapsedTime, bool DoUpdateUI) override final;
 
-    virtual const Char* GetSampleName() const override final { return "Tutorial02: Cube"; }
+    virtual const Char* GetSampleName() const override final { return "Sapana Sandbox"; }
 
 private:
-    void CreatePipelineState();
-    void CreateVertexBuffer();
-    void CreateIndexBuffer();
+    void FindDroneEntity();
+    void EnterDroneMode();
+    void EnterFreelookMode();
 
-    RefCntAutoPtr<IPipelineState>         m_pPSO;
-    RefCntAutoPtr<IShaderResourceBinding> m_pSRB;
-    RefCntAutoPtr<IBuffer>                m_CubeVertexBuffer;
-    RefCntAutoPtr<IBuffer>                m_CubeIndexBuffer;
-    RefCntAutoPtr<IBuffer>                m_VSConstants;
-    float4x4                              m_WorldViewProjMatrix;
+    sapana::camera::Camera                 m_Camera;
+    sapana::input::InputSystem             m_InputSystem;
+    sapana::input::CursorController        m_CursorController;
+    sapana::assets::AssetCache             m_AssetCache;
+    sapana::render::BasicForwardRenderer   m_BasicRenderer;
+    sapana::render::PbrGltfRenderer        m_PbrRenderer;
+    sapana::physics::PhysicsSystem         m_Physics;
+    sapana::render::RenderMode             m_RenderMode = sapana::render::RenderMode::Basic;
+    entt::registry                         m_Registry;
+    float4x4                               m_ViewMatrix;
+    float4x4                               m_ProjMatrix;
+    float4x4                               m_ViewProjMatrix;
 
-    sapana::camera::Camera             m_Camera;
-    sapana::input::InputSystem         m_InputSystem;
-    sapana::input::CursorController    m_CursorController;
+    ControlMode   m_ControlMode  = ControlMode::Freelook;
+    entt::entity  m_DroneEntity  = entt::null;
+    float         m_DroneYaw     = 0.f;
+    float         m_DronePitch   = 0.f;
+    float         m_DroneMoveSpeed = 4.f;
+    float         m_LookSensitivity = 0.003f;
+    float         m_PitchLimit   = PI_F / 2.f - 0.01f;
 };
 
 } // namespace Diligent

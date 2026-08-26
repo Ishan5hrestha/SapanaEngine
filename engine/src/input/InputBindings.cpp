@@ -23,8 +23,9 @@ void InputBindings::ResetToDefaults()
     m_Bindings[static_cast<std::size_t>(Action::MoveRight)]    = {"Diligent.MoveRight"};
     m_Bindings[static_cast<std::size_t>(Action::MoveUp)]       = {"Diligent.MoveUp"};
     m_Bindings[static_cast<std::size_t>(Action::MoveDown)]     = {"Diligent.MoveDown"};
-    m_Bindings[static_cast<std::size_t>(Action::Look)]         = {"Mouse.Delta"};
-    m_Bindings[static_cast<std::size_t>(Action::ToggleCursor)] = {"Key.M"};
+    m_Bindings[static_cast<std::size_t>(Action::Look)]              = {"Mouse.Delta"};
+    m_Bindings[static_cast<std::size_t>(Action::ToggleCursor)]      = {"Key.M"};
+    m_Bindings[static_cast<std::size_t>(Action::ToggleControlMode)] = {"Key.K"};
 }
 
 bool InputBindings::LoadFromFile(const char* path)

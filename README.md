@@ -15,17 +15,25 @@ Diligent is a **dependency**, not the codebase itself. It exposes modern pipelin
 ## Repo structure
 
 ```text
-SapanaEngine/                <- own git repo, own version control
-├── engine/                  <- engine code (ECS, scene, asset systems, renderer wrapper)
-├── game/                    <- actual game(s) built on the engine
+SapanaEngine/
+├── engine/                  <- ECS, scene, assets, render, physics
+│   └── include/sapana/
+│       ├── camera/ input/ ecs/ assets/ scene/ render/
+│       └── physics/         <- Sapana physics API (Jolt hidden behind pimpl)
+├── game/sandbox_cube/       <- sandbox sample + assets (scenes, config, meshes)
 ├── third_party/
-│   └── DiligentEngine/      <- git submodule, pinned to a specific commit/tag
-├── assets/
-├── CMakeLists.txt           <- top-level build, add_subdirectory(third_party/DiligentEngine)
-└── .gitignore
+│   ├── DiligentEngine/      <- git submodule (pinned)
+│   └── nlohmann/            <- json.hpp
+├── CMakeLists.txt
+├── rebuld.sh                <- incremental build (preferred day-to-day)
+└── reconf_n_rebuild.sh      <- wipe build/Linux and full reconfigure (slow)
 ```
 
-Diligent is pulled in as a **git submodule** (not a manual clone) so the whole team builds against an identical, pinned commit. Upgrades are deliberate via `git submodule update --remote`, not accidental surprises.
+| Dependency | How it is obtained |
+| --- | --- |
+| Diligent Engine | Git submodule under `third_party/DiligentEngine` |
+| EnTT | Fetched with DiligentFX |
+| **Jolt Physics** | CMake `FetchContent`, pinned tag **`v5.3.0`** (not a submodule) |
 
 ## Dev environment
 
@@ -35,20 +43,11 @@ Reference machine: **Linux Mint 22.3 "Zena"** (Ubuntu 24.04 / Noble base).
 | --- | --- |
 | Compiler | g++ 13.3.0 (via `build-essential`) |
 | Build system | CMake 3.28.3 + Ninja |
-| GPU | Intel HD Graphics 620 (Kaby Lake, integrated) — Vulkan 1.4 via Mesa. Fine for development; not representative of target performance for heavier scenes |
-| Vulkan SDK | LunarG APT repo (`vulkan-sdk`, noble distro codename) |
+| GPU | Intel HD Graphics 620 (Kaby Lake, integrated) — Vulkan 1.4 via Mesa |
+| Vulkan SDK | LunarG APT repo (`vulkan-sdk`, noble) |
 | Windowing libs | `libx11-dev`, `libxrandr-dev`, `libxinerama-dev`, `libxcursor-dev`, `libxi-dev`, `libwayland-dev` |
-| Editor | VS Code (recommended) with C/C++ and CMake Tools extensions |
 
-### Paths
-
-| Path | Purpose |
-| --- | --- |
-| `~/SapanaEngine` | Project repo |
-| `~/SapanaEngine/third_party/DiligentEngine` | Diligent Engine submodule |
-| `~/SapanaEngine/build/Linux` | Build output (once top-level CMake is set up) |
-
-Default build config: **Debug** (`-DCMAKE_BUILD_TYPE=Debug`) — validation layers and assertions active.
+Default build config: **Debug** (`-DCMAKE_BUILD_TYPE=Debug`).
 
 ## Setup (Ubuntu / Mint / Debian-based)
 
@@ -62,11 +61,46 @@ sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-noble.list https://packages.
 sudo apt update
 sudo apt install vulkan-sdk
 
-vulkaninfo --summary   # verify
-
 git clone --recursive <SapanaEngine repo URL> ~/SapanaEngine
 ```
 
-The `--recursive` flag pulls in the DiligentEngine submodule automatically — no separate Diligent install is needed by team members.
+First configure fetches Jolt once into the CMake build tree (`build/Linux/_deps/...`). Day-to-day:
 
-**Other platforms:** swap `apt` / `noble` for your distro's package manager and LunarG codename; adjust entirely for Windows / macOS.
+```bash
+bash rebuld.sh
+cd build/Linux/game/sandbox_cube && ./Tutorial02_Cube
+```
+
+`rebuld.sh` builds the sandbox **and copies the entire** `game/sandbox_cube/assets/` tree next to the binary (configs, scenes, meshes, shaders). Edit files under `assets/`, run `rebuld.sh`, relaunch — no manual per-file copies. JSON is loaded at startup (restart the app to pick up changes).
+
+Use `bash reconf_n_rebuild.sh` only when CMake targets are missing or the build tree is corrupted (it deletes `build/Linux`).
+
+## Physics (Jolt)
+
+Simulation is **opt-in** and separate from rendering:
+
+- Scene entities may include a `"physics"` block (`body`: `static`|`dynamic`, `shape`: `box`|`plane`, mass/friction/restitution).
+- No `physics` block → mesh-only (e.g. decorative props).
+- `config/physics.json` sets gravity and fixed timestep (`1/60` by default).
+- Each frame, `PhysicsSystem` steps Jolt and writes **dynamic** poses back into `ecs::Transform` before draw.
+- Public headers never expose Jolt types — see [engine/include/sapana/physics/README.md](engine/include/sapana/physics/README.md).
+
+Sandbox demo: green ground is **static**; cubes are **dynamic**; `Gltf_Cube` is visual-only. Entity **Drone** (`meshes/drone.glb`) is dynamic with gravity factor 0 for flying.
+
+**Controls:** WASD/QE move, mouse look, **M** toggle cursor, **K** toggle freelook camera vs drone + third-person chase cam.
+
+### Physics extension roadmap
+
+- Contact callbacks for gameplay
+- Heightfield terrain collider
+- Character controller (`CharacterVirtual`)
+- Extra collision layers / triggers
+- Constraints and kinematic platforms
+
+## Coordinates
+
+- **Y-up**, right-handed style consistent with Diligent samples
+- Scene `rotation_degrees` are Euler degrees; physics converts at the Jolt boundary
+- Prefer meters as world units
+
+**Other platforms:** swap `apt` / `noble` for your distro; adjust for Windows / macOS as needed.
