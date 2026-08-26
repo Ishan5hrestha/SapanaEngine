@@ -8,16 +8,23 @@ if errorlevel 1 (
     exit /b 1
 )
 
-rem Incremental sandbox build + always sync assets next to the binary.
-
 set "ROOT=%~dp0"
 if "%ROOT:~-1%"=="\" set "ROOT=%ROOT:~0,-1%"
 set "BUILD=%ROOT%\build\Windows"
 set "OUT=%BUILD%\game\sandbox_cube"
 
-cmake --build "${BUILD}" -j"$(nproc)" --target SapanaSandbox
+cmake --build "%BUILD%" -j %NUMBER_OF_PROCESSORS% --target SapanaSandbox
+if errorlevel 1 (
+    echo Build failed.
+    exit /b 1
+)
 
-# Covers JSON-only edits when CMake skips POST_BUILD because nothing recompiled.
-mkdir -p "${OUT}"
-cp -a "${ROOT}/game/sandbox_cube/assets/." "${OUT}/"
-echo "Assets synced -> ${OUT}"
+if not exist "%OUT%" mkdir "%OUT%"
+robocopy "%ROOT%\game\sandbox_cube\assets" "%OUT%" /E /NFL /NDL /NJH /NJS
+if errorlevel 8 (
+    echo Asset sync failed.
+    exit /b 1
+)
+
+echo Assets synced -^> %OUT%
+endlocal

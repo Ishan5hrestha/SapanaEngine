@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-find_package(X11 REQUIRED)
+#find_package(X11 REQUIRED)
 
 include(FetchContent)
 
@@ -72,7 +72,7 @@ PRIVATE
     Diligent-TextureLoader
     DiligentFX
     Jolt
-    X11::X11
+    # X11::X11
 )
 
 set_common_target_properties(SapanaEngine)
