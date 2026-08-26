@@ -19,6 +19,7 @@ enum class Action : std::size_t
     Look,
     ToggleCursor,
     ToggleControlMode,
+    Thrust,
     Count
 };
 

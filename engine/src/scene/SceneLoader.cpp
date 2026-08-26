@@ -100,9 +100,46 @@ void LoadPhysicsBlock(const nlohmann::json& entJson, entt::entity entity, entt::
     registry.emplace<physics::Collider>(entity, collider);
 }
 
+void LoadMotorBlock(const nlohmann::json& entJson, entt::entity entity, entt::registry& registry)
+{
+    if (!entJson.contains("motor") || !entJson.at("motor").is_object())
+        return;
+
+    const auto& m = entJson.at("motor");
+    physics::ForceMotor motor;
+
+    if (m.contains("max_speed") && m.at("max_speed").is_number())
+        motor.MaxSpeed = m.at("max_speed").get<float>();
+    if (m.contains("horizontal_force") && m.at("horizontal_force").is_number())
+        motor.HorizontalForce = m.at("horizontal_force").get<float>();
+    if (m.contains("thrust_force") && m.at("thrust_force").is_number())
+        motor.ThrustForce = m.at("thrust_force").get<float>();
+    if (m.contains("down_force") && m.at("down_force").is_number())
+        motor.DownForce = m.at("down_force").get<float>();
+    if (m.contains("drag") && m.at("drag").is_number())
+        motor.Drag = m.at("drag").get<float>();
+    if (m.contains("enabled") && m.at("enabled").is_boolean())
+        motor.Enabled = m.at("enabled").get<bool>();
+
+    for (auto it = m.begin(); it != m.end(); ++it)
+    {
+        const std::string& key = it.key();
+        if (key != "max_speed" && key != "horizontal_force" && key != "thrust_force" &&
+            key != "down_force" && key != "drag" && key != "enabled")
+        {
+            std::cerr << "Sapana SceneLoader: ignoring unknown motor field '" << key << "'\n";
+        }
+    }
+
+    registry.emplace<physics::ForceMotor>(entity, motor);
+}
+
 } // namespace
 
-bool SceneLoader::Load(const char* path, entt::registry& registry, assets::AssetCache& assetCache)
+bool SceneLoader::Load(const char*              path,
+                       entt::registry&          registry,
+                       assets::AssetCache&      assetCache,
+                       const render::LodConfig* lodConfig)
 {
     if (path == nullptr)
     {
@@ -181,12 +218,38 @@ bool SceneLoader::Load(const char* path, entt::registry& registry, assets::Asset
                     }
                     else
                     {
+                        const assets::AssetId baseMeshId = renderer.MeshId;
                         registry.emplace<ecs::MeshRenderer>(entity, std::move(renderer));
+                        registry.emplace<ecs::Visibility>(entity);
+
+                        if (lodConfig != nullptr)
+                        {
+                            const auto* entry = lodConfig->FindMeshEntry(baseMeshId);
+                            if (entry != nullptr)
+                            {
+                                ecs::LodGroup lod;
+                                lod.BaseMeshId     = baseMeshId;
+                                lod.Lod1MeshId     = entry->Lod1;
+                                lod.BoundingRadius = entry->BoundingRadius;
+                                if (!lod.Lod1MeshId.Empty())
+                                {
+                                    if (assetCache.GetOrLoad(lod.Lod1MeshId) == nullptr)
+                                    {
+                                        std::cerr << "Sapana SceneLoader: failed to preload LOD1 '"
+                                                  << lod.Lod1MeshId.Str() << "' for '"
+                                                  << registry.get<ecs::Name>(entity).Value << "'\n";
+                                        lod.Lod1MeshId = assets::AssetId{};
+                                    }
+                                }
+                                registry.emplace<ecs::LodGroup>(entity, std::move(lod));
+                            }
+                        }
                     }
                 }
             }
 
             LoadPhysicsBlock(entJson, entity, registry);
+            LoadMotorBlock(entJson, entity, registry);
         }
     }
 

@@ -1,0 +1,32 @@
+{
+  "clear_color": [0.55, 0.65, 0.78, 1.0],
+  "enable_ibl": false,
+  "sky": {
+    "enabled": true,
+    "zenith_color": [0.15, 0.35, 0.75],
+    "horizon_color": [0.55, 0.65, 0.78],
+    "ground_color": [0.22, 0.20, 0.18],
+    "horizon_falloff": 0.35
+  },
+  "shadows": {
+    "enabled": true,
+    "resolution": 2048,
+    "cascades": 1,
+    "pcf_kernel": 5,
+    "max_distance": 45.0,
+    "depth_bias": 0.0015
+  },
+  "lights": [
+    {
+      "type": "directional",
+      "direction": [-0.4, -1.0, -0.3],
+      "color": [1.0, 1.0, 1.0],
+      "intensity": 3.0
+    }
+  ],
+  "tone_mapping": {
+    "average_log_lum": 0.3,
+    "middle_gray": 0.18,
+    "white_point": 3.0
+  }
+}

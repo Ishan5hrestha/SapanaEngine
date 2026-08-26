@@ -82,12 +82,25 @@ Simulation is **opt-in** and separate from rendering:
 - Scene entities may include a `"physics"` block (`body`: `static`|`dynamic`, `shape`: `box`|`plane`, mass/friction/restitution).
 - No `physics` block → mesh-only (e.g. decorative props).
 - `config/physics.json` sets gravity and fixed timestep (`1/60` by default).
+- `config/lighting.json` sets clear color, directional sun light(s), tone mapping, procedural `"sky"`, and `"shadows"` (PCF; `enable_ibl` reserved for HDRI later).
+- `config/lod.json` drives frustum/distance culling and mesh LOD (e.g. `tree_1` → `tree_1_lod1`); far objects are not drawn.
 - Each frame, `PhysicsSystem` steps Jolt and writes **dynamic** poses back into `ecs::Transform` before draw.
 - Public headers never expose Jolt types — see [engine/include/sapana/physics/README.md](engine/include/sapana/physics/README.md).
 
-Sandbox demo: green ground is **static**; cubes are **dynamic**; `Gltf_Cube` is visual-only. Entity **Drone** (`meshes/drone.glb`) is dynamic with gravity factor 0 for flying.
+Sandbox demo: green ground is **static**; cubes are **dynamic** with varied masses; ~40 **static** trees (`meshes/tree_1.glb`) collide but never move; `Gltf_Cube` is visual-only. Entity **Drone** uses a reusable `ForceMotor` (forces + gravity + Space thrust).
 
-**Controls:** WASD/QE move, mouse look, **M** toggle cursor, **K** toggle freelook camera vs drone + third-person chase cam.
+**Controls (freelook):** WASD + Q/E, mouse look, **M** cursor, **K** drone mode.  
+**Controls (drone):** W/S forward/back, A/D turn, **Space** thrust; mouse does nothing.
+
+## Known issues
+
+### Far-distance cull color flicker (LOD / visibility)
+
+With `config/lod.json` `"enabled": true`, moving far from the scene origin can produce **strobing red / green / blue / white** (colored builtin cubes popping, sky/clear showing through). It happens in **both freelook and drone** modes (one shared view + cull path per frame, not two cameras).
+
+Likely mix of: hard far-distance hide vs camera `far_plane`, shadow-map contents changing as casters drop while receivers still draw, and unstable PCF on Basic meshes. Sticky hysteresis and related tweaks did **not** fully resolve it.
+
+**Workaround:** set `"enabled": false` in `config/lod.json` (keeps meshes drawn; no distance/LOD cull). Restart the app after editing.
 
 ### Physics extension roadmap
 

@@ -5,7 +5,9 @@
 #include "RenderDevice.h"
 #include "RefCntAutoPtr.hpp"
 #include "SwapChain.h"
+#include "TextureView.h"
 #include "sapana/assets/AssetCache.hpp"
+#include "sapana/render/LightingConfig.hpp"
 
 #include <entt/entt.hpp>
 #include <memory>
@@ -30,6 +32,14 @@ public:
 
     PbrGltfRenderer(const PbrGltfRenderer&)            = delete;
     PbrGltfRenderer& operator=(const PbrGltfRenderer&) = delete;
+
+    /// Call before Initialize so EnableIBL / EnableShadows apply at creation.
+    void ApplyConfig(const LightingConfig& config);
+
+    /// Bind shadow map SRV + cascade 0 world-to-light matrix (call each frame before Draw).
+    void SetShadowResources(Diligent::ITextureView*     shadowMapSRV,
+                            const Diligent::float4x4&   worldToLightProj,
+                            bool                        shadowsActive);
 
     bool Initialize(Diligent::IRenderDevice*  device,
                     Diligent::IDeviceContext* context,

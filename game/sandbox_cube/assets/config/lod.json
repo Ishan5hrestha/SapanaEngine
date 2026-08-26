@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "frustum_culling": false,
+  "debug_stats": false,
+  "far_cull_distance": 100.0,
+  "lod1_distance": 28.0,
+  "hysteresis": 8.0,
+  "shadow_far_cull_distance": 100.0,
+  "shadow_lod1_distance": 22.0,
+  "default_bounding_radius": 3.0,
+  "meshes": {
+    "meshes/tree_1.glb": {
+      "lod1": "meshes/tree_1_lod1.glb",
+      "bounding_radius": 2.5
+    }
+  }
+}

@@ -14,6 +14,10 @@ add_sample_app(Tutorial02_Cube
     SHADERS
         assets/cube.vsh
         assets/cube.psh
+        assets/shaders/sky.vsh
+        assets/shaders/sky.psh
+        assets/shaders/shadow_depth.vsh
+        assets/shaders/shadow_depth.psh
 )
 
 target_link_libraries(Tutorial02_Cube PRIVATE SapanaEngine)

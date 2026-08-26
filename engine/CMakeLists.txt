@@ -39,8 +39,14 @@ add_library(SapanaEngine STATIC
     src/scene/SceneLoader.cpp
     src/render/BasicForwardRenderer.cpp
     src/render/PbrGltfRenderer.cpp
+    src/render/LightingConfig.cpp
+    src/render/LodConfig.cpp
+    src/render/VisibilityAndLodSystem.cpp
+    src/render/SkyRenderer.cpp
+    src/render/ShadowSystem.cpp
     src/physics/PhysicsConfig.cpp
     src/physics/PhysicsSystem.cpp
+    src/physics/ForceMotorSystem.cpp
 )
 
 target_include_directories(SapanaEngine

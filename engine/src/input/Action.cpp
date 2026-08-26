@@ -20,6 +20,7 @@ const char* ActionToString(Action action)
         case Action::Look:               return "Look";
         case Action::ToggleCursor:       return "ToggleCursor";
         case Action::ToggleControlMode:  return "ToggleControlMode";
+        case Action::Thrust:             return "Thrust";
         case Action::Count:              break;
     }
     return "Unknown";

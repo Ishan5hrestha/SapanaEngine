@@ -31,5 +31,25 @@ struct PhysicsBody
     BodyId Id = kInvalidBodyId;
 };
 
+/// Reusable force-based motor (authored via scene "motor" block).
+struct ForceMotor
+{
+    float MaxSpeed         = 8.f;
+    float HorizontalForce  = 25.f;
+    float ThrustForce      = 40.f;
+    float DownForce        = 15.f; // mild downward when MoveDown held
+    float Drag             = 2.f;
+    bool  Enabled          = true;
+};
+
+/// Per-frame input consumed by ForceMotorSystem (not authored in JSON).
+struct MotorInput
+{
+    Diligent::float3 LocalMove{0.f, 0.f, 0.f}; // x=right, y=up hint, z=forward (camera-style)
+    float            YawRadians = 0.f;
+    bool             Thrust     = false; // Space / primary lift
+    bool             Active     = false; // false → no drive forces (still may apply drag if Desired)
+};
+
 } // namespace physics
 } // namespace sapana

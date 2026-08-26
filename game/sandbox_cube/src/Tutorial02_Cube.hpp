@@ -35,8 +35,14 @@
 #include "sapana/input/InputSystem.hpp"
 #include "sapana/render/BasicForwardRenderer.hpp"
 #include "sapana/render/PbrGltfRenderer.hpp"
+#include "sapana/render/LightingConfig.hpp"
+#include "sapana/render/LodConfig.hpp"
+#include "sapana/render/SkyRenderer.hpp"
+#include "sapana/render/ShadowSystem.hpp"
 #include "sapana/render/RenderMode.hpp"
+#include "sapana/render/VisibilityAndLodSystem.hpp"
 #include "sapana/physics/PhysicsSystem.hpp"
+#include "sapana/physics/ForceMotorSystem.hpp"
 
 #include <entt/entt.hpp>
 #include <memory>
@@ -71,7 +77,13 @@ private:
     sapana::assets::AssetCache             m_AssetCache;
     sapana::render::BasicForwardRenderer   m_BasicRenderer;
     sapana::render::PbrGltfRenderer        m_PbrRenderer;
-    sapana::physics::PhysicsSystem         m_Physics;
+    sapana::render::SkyRenderer            m_SkyRenderer;
+    sapana::render::ShadowSystem           m_ShadowSystem;
+    sapana::render::LightingConfig           m_LightingConfig;
+    sapana::render::LodConfig                m_LodConfig;
+    sapana::render::VisibilityAndLodSystem   m_VisibilityLod;
+    sapana::physics::PhysicsSystem           m_Physics;
+    sapana::physics::ForceMotorSystem      m_ForceMotors;
     sapana::render::RenderMode             m_RenderMode = sapana::render::RenderMode::Basic;
     entt::registry                         m_Registry;
     float4x4                               m_ViewMatrix;
@@ -81,8 +93,6 @@ private:
     ControlMode   m_ControlMode  = ControlMode::Freelook;
     entt::entity  m_DroneEntity  = entt::null;
     float         m_DroneYaw     = 0.f;
-    float         m_DronePitch   = 0.f;
-    float         m_DroneMoveSpeed = 4.f;
     float         m_LookSensitivity = 0.003f;
     float         m_PitchLimit   = PI_F / 2.f - 0.01f;
 };

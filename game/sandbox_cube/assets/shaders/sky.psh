@@ -1,0 +1,37 @@
+cbuffer Constants
+{
+    float4x4 g_InvViewProj;
+    float4   g_Zenith;
+    float4   g_Horizon;
+    float4   g_Ground;
+    float4   g_FalloffPad; // x = horizon falloff
+};
+
+struct PSInput
+{
+    float4 Pos : SV_POSITION;
+    float3 Ray : RAY;
+};
+
+struct PSOutput
+{
+    float4 Color : SV_TARGET;
+};
+
+void main(in PSInput PSIn, out PSOutput PSOut)
+{
+    float3 dir = normalize(PSIn.Ray);
+    float  y   = dir.y;
+    float  falloff = max(g_FalloffPad.x, 1e-3);
+
+    // Soft blend around the horizon using falloff.
+    float  above = saturate((y + falloff) / (2.0 * falloff));
+    float3 sky   = lerp(g_Horizon.rgb, g_Zenith.rgb, saturate(y));
+    float3 ground = lerp(g_Ground.rgb, g_Horizon.rgb, saturate(y + 1.0));
+    float3 color  = lerp(ground, sky, above);
+
+#if CONVERT_PS_OUTPUT_TO_GAMMA
+    color = pow(color, float3(1.0 / 2.2, 1.0 / 2.2, 1.0 / 2.2));
+#endif
+    PSOut.Color = float4(color, 1.0);
+}

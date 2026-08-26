@@ -7,5 +7,6 @@
   "MoveDown":          ["Diligent.MoveDown"],
   "Look":              ["Mouse.Delta"],
   "ToggleCursor":      ["Key.M"],
-  "ToggleControlMode": ["Key.K"]
+  "ToggleControlMode": ["Key.K"],
+  "Thrust":            ["Key.Space"]
 }

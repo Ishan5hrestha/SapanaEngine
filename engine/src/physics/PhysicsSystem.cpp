@@ -286,6 +286,13 @@ void PhysicsSystem::CreateBodies(entt::registry& registry)
             settings.mMassPropertiesOverride.mMass = rigid.Mass;
         }
 
+        // Force-driven bodies: translation only — sample/game code owns yaw via SetRotationDegrees.
+        if (bodyType == BodyType::Dynamic && registry.all_of<ForceMotor>(entity))
+        {
+            settings.mAllowedDOFs = JPH::EAllowedDOFs::TranslationX | JPH::EAllowedDOFs::TranslationY |
+                                    JPH::EAllowedDOFs::TranslationZ;
+        }
+
         const JPH::EActivation activation =
             (bodyType == BodyType::Dynamic) ? JPH::EActivation::Activate : JPH::EActivation::DontActivate;
 
@@ -386,6 +393,34 @@ void PhysicsSystem::SetGravityFactor(BodyId id, float factor)
         return;
 
     bodies.SetGravityFactor(joltId, factor);
+}
+
+void PhysicsSystem::AddForce(BodyId id, const Diligent::float3& force)
+{
+    if (!IsInitialized() || id == kInvalidBodyId)
+        return;
+
+    const JPH::BodyID joltId(id);
+    JPH::BodyInterface& bodies = m_Impl->World->GetBodyInterface();
+    if (!bodies.IsAdded(joltId))
+        return;
+
+    bodies.AddForce(joltId, ToJolt(force));
+    bodies.ActivateBody(joltId);
+}
+
+Diligent::float3 PhysicsSystem::GetLinearVelocity(BodyId id)
+{
+    if (!IsInitialized() || id == kInvalidBodyId)
+        return Diligent::float3{0.f, 0.f, 0.f};
+
+    const JPH::BodyID joltId(id);
+    JPH::BodyInterface& bodies = m_Impl->World->GetBodyInterface();
+    if (!bodies.IsAdded(joltId))
+        return Diligent::float3{0.f, 0.f, 0.f};
+
+    const JPH::Vec3 v = bodies.GetLinearVelocity(joltId);
+    return Diligent::float3{v.GetX(), v.GetY(), v.GetZ()};
 }
 
 } // namespace physics

@@ -40,10 +40,12 @@ public:
 
     bool IsInitialized() const;
 
-    /// Drive a dynamic body (e.g. player drone). No-op if id invalid / not added.
+    /// Drive / query dynamic bodies. No-op if id invalid / not added.
     void SetLinearVelocity(BodyId id, const Diligent::float3& velocity);
     void SetRotationDegrees(BodyId id, const Diligent::float3& eulerDegrees);
     void SetGravityFactor(BodyId id, float factor);
+    void AddForce(BodyId id, const Diligent::float3& force);
+    Diligent::float3 GetLinearVelocity(BodyId id);
 
 private:
     struct Impl;

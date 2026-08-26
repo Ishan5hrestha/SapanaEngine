@@ -60,6 +60,9 @@ bool InputSystem::EvaluateKeyToken(const std::string& token, ImGuiIO* io) const
     if (io == nullptr)
         return false;
 
+    if (token == "Key.Space")
+        return ImGui::IsKeyDown(ImGuiKey_Space);
+
     if (token.size() == 5 && token.compare(0, 4, "Key.") == 0)
     {
         const char letter = token[4];

@@ -46,5 +46,23 @@ struct MeshRenderer
     float4          Color{1.f, 1.f, 1.f, 1.f};
 };
 
+/// Optional LOD table binding (from lod.json). BaseMeshId matches MeshRenderer.MeshId at load.
+struct LodGroup
+{
+    assets::AssetId BaseMeshId;
+    assets::AssetId Lod1MeshId;
+    float           BoundingRadius = 2.5f;
+    int             CurrentLevel   = 0; // camera color pass
+    int             ShadowLevel    = 0; // shadow caster pass
+};
+
+/// Per-frame render visibility (updated by VisibilityAndLodSystem). Missing => treat as visible.
+/// InCamera / InShadow are sticky across frames for far-cull hysteresis (anti-flicker).
+struct Visibility
+{
+    bool InCamera = true;
+    bool InShadow = true;
+};
+
 } // namespace ecs
 } // namespace sapana

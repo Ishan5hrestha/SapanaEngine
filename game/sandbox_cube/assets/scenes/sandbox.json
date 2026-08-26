@@ -4,13 +4,30 @@
     {
       "name": "Ground",
       "transform": {
-        "position": [0, -1.01, 0],
-        "rotation_degrees": [0, 0, 0],
-        "scale": [40, 1, 40]
+        "position": [
+          0,
+          -1.01,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          40,
+          1,
+          40
+        ]
       },
       "mesh": {
         "asset": "builtin:plane",
-        "color": [0.22, 0.55, 0.28, 1]
+        "color": [
+          0.22,
+          0.55,
+          0.28,
+          1
+        ]
       },
       "physics": {
         "body": "static",
@@ -21,109 +38,1782 @@
     {
       "name": "Cube_A",
       "transform": {
-        "position": [0, 5, 0],
-        "rotation_degrees": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          5,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "mesh": {
         "asset": "builtin:cube",
-        "color": [1, 0.2, 0.2, 1]
+        "color": [
+          1,
+          0.2,
+          0.2,
+          1
+        ]
       },
       "physics": {
         "body": "dynamic",
         "shape": "box",
-        "mass": 1.0,
-        "friction": 0.5,
+        "mass": 1.2,
+        "friction": 0.6,
         "restitution": 0.1
       }
     },
     {
       "name": "Cube_B",
       "transform": {
-        "position": [3, 6, 0],
-        "rotation_degrees": [0, 35, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          3,
+          6,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          35,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "mesh": {
         "asset": "builtin:cube",
-        "color": [0.2, 1, 0.2, 1]
+        "color": [
+          0.2,
+          1,
+          0.2,
+          1
+        ]
       },
       "physics": {
         "body": "dynamic",
         "shape": "box",
-        "mass": 1.0,
-        "friction": 0.5,
-        "restitution": 0.2
+        "mass": 30,
+        "friction": 0.7,
+        "restitution": 0.05
       }
     },
     {
       "name": "Gltf_Cube",
       "transform": {
-        "position": [-3, 0, 0],
-        "rotation_degrees": [0, -25, 0],
-        "scale": [0.85, 0.85, 0.85]
+        "position": [
+          -3,
+          0,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          -25,
+          0
+        ],
+        "scale": [
+          0.85,
+          0.85,
+          0.85
+        ]
       },
       "mesh": {
         "asset": "meshes/cube.glb",
-        "color": [0.95, 0.75, 0.2, 1]
+        "color": [
+          0.95,
+          0.75,
+          0.2,
+          1
+        ]
       }
     },
     {
       "name": "Cube_C",
       "transform": {
-        "position": [6, 6, 0],
-        "rotation_degrees": [0, 35, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          6,
+          6,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          35,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "mesh": {
         "asset": "builtin:cube",
-        "color": [0.2, 1, 0.2, 1]
+        "color": [
+          0.2,
+          1,
+          0.2,
+          1
+        ]
       },
       "physics": {
         "body": "dynamic",
         "shape": "box",
-        "mass": 1.0,
-        "friction": 0.5,
-        "restitution": 0.2
+        "mass": 35,
+        "friction": 0.7,
+        "restitution": 0.05
       }
     },
     {
       "name": "Cube_D",
       "transform": {
-        "position": [8, 8, 0],
-        "rotation_degrees": [0, 35, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          8,
+          8,
+          0
+        ],
+        "rotation_degrees": [
+          0,
+          35,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "mesh": {
         "asset": "builtin:cube",
-        "color": [0.2, 1, 0.2, 1]
+        "color": [
+          0.2,
+          1,
+          0.2,
+          1
+        ]
       },
       "physics": {
         "body": "dynamic",
         "shape": "box",
-        "mass": 1.0,
-        "friction": 0.5,
-        "restitution": 0.2
+        "mass": 120,
+        "friction": 0.85,
+        "restitution": 0.0
       }
     },
     {
       "name": "Drone",
       "transform": {
-        "position": [0, 2, -8],
-        "rotation_degrees": [0, 0, 0],
-        "scale": [0.05, 0.05, 0.05]
+        "position": [
+          0,
+          2,
+          -8
+        ],
+        "rotation_degrees": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.05,
+          0.05,
+          0.05
+        ]
       },
       "mesh": {
         "asset": "meshes/drone.glb",
-        "color": [1, 1, 1, 1]
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
       },
       "physics": {
         "body": "dynamic",
         "shape": "box",
-        "mass": 1.0,
+        "mass": 1.5,
         "friction": 0.4,
         "restitution": 0.0,
-        "half_extents": [0.6, 0.25, 0.6]
+        "half_extents": [
+          0.6,
+          0.25,
+          0.6
+        ]
+      },
+      "motor": {
+        "max_speed": 8,
+        "horizontal_force": 25,
+        "thrust_force": 55,
+        "down_force": 15,
+        "drag": 2
+      }
+    },
+    {
+      "name": "Tree_00",
+      "transform": {
+        "position": [
+          9.48,
+          -1.01,
+          -32.3
+        ],
+        "rotation_degrees": [
+          0,
+          99.0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_01",
+      "transform": {
+        "position": [
+          -18.82,
+          -1.01,
+          16.08
+        ],
+        "rotation_degrees": [
+          0,
+          243.6,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_02",
+      "transform": {
+        "position": [
+          26.67,
+          -1.01,
+          -28.09
+        ],
+        "rotation_degrees": [
+          0,
+          151.9,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_03",
+      "transform": {
+        "position": [
+          -31.97,
+          -1.01,
+          -19.13
+        ],
+        "rotation_degrees": [
+          0,
+          181.9,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_04",
+      "transform": {
+        "position": [
+          10.19,
+          -1.01,
+          3.06
+        ],
+        "rotation_degrees": [
+          0,
+          79.4,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_05",
+      "transform": {
+        "position": [
+          6.07,
+          -1.01,
+          21.04
+        ],
+        "rotation_degrees": [
+          0,
+          2.3,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_06",
+      "transform": {
+        "position": [
+          20.8,
+          -1.01,
+          13.47
+        ],
+        "rotation_degrees": [
+          0,
+          122.5,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_07",
+      "transform": {
+        "position": [
+          -23.43,
+          -1.01,
+          31.09
+        ],
+        "rotation_degrees": [
+          0,
+          121.2,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_08",
+      "transform": {
+        "position": [
+          -27.69,
+          -1.01,
+          -27.42
+        ],
+        "rotation_degrees": [
+          0,
+          305.1,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_09",
+      "transform": {
+        "position": [
+          15.62,
+          -1.01,
+          2.46
+        ],
+        "rotation_degrees": [
+          0,
+          350.3,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_10",
+      "transform": {
+        "position": [
+          -8.26,
+          -1.01,
+          3.54
+        ],
+        "rotation_degrees": [
+          0,
+          298.6,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_11",
+      "transform": {
+        "position": [
+          5.26,
+          -1.01,
+          13.91
+        ],
+        "rotation_degrees": [
+          0,
+          16.5,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_12",
+      "transform": {
+        "position": [
+          -18.5,
+          -1.01,
+          -14.32
+        ],
+        "rotation_degrees": [
+          0,
+          28.7,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_13",
+      "transform": {
+        "position": [
+          -18.17,
+          -1.01,
+          -27.13
+        ],
+        "rotation_degrees": [
+          0,
+          100.1,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_14",
+      "transform": {
+        "position": [
+          9.23,
+          -1.01,
+          -9.19
+        ],
+        "rotation_degrees": [
+          0,
+          133.3,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_15",
+      "transform": {
+        "position": [
+          29.69,
+          -1.01,
+          10.07
+        ],
+        "rotation_degrees": [
+          0,
+          219.3,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_16",
+      "transform": {
+        "position": [
+          -22.89,
+          -1.01,
+          -8.2
+        ],
+        "rotation_degrees": [
+          0,
+          356.2,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_17",
+      "transform": {
+        "position": [
+          12.55,
+          -1.01,
+          23.31
+        ],
+        "rotation_degrees": [
+          0,
+          279.4,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_18",
+      "transform": {
+        "position": [
+          -18.42,
+          -1.01,
+          -31.82
+        ],
+        "rotation_degrees": [
+          0,
+          113.6,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_19",
+      "transform": {
+        "position": [
+          -15.79,
+          -1.01,
+          -19.65
+        ],
+        "rotation_degrees": [
+          0,
+          339.4,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_20",
+      "transform": {
+        "position": [
+          25.59,
+          -1.01,
+          -12.6
+        ],
+        "rotation_degrees": [
+          0,
+          236.0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_21",
+      "transform": {
+        "position": [
+          -7.1,
+          -1.01,
+          28.19
+        ],
+        "rotation_degrees": [
+          0,
+          165.2,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_22",
+      "transform": {
+        "position": [
+          4.17,
+          -1.01,
+          -16.13
+        ],
+        "rotation_degrees": [
+          0,
+          210.5,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_23",
+      "transform": {
+        "position": [
+          27.05,
+          -1.01,
+          -6.84
+        ],
+        "rotation_degrees": [
+          0,
+          79.0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_24",
+      "transform": {
+        "position": [
+          33.83,
+          -1.01,
+          0.65
+        ],
+        "rotation_degrees": [
+          0,
+          32.7,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_25",
+      "transform": {
+        "position": [
+          -5.29,
+          -1.01,
+          -29.68
+        ],
+        "rotation_degrees": [
+          0,
+          137.4,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_26",
+      "transform": {
+        "position": [
+          32.03,
+          -1.01,
+          24.53
+        ],
+        "rotation_degrees": [
+          0,
+          4.1,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_27",
+      "transform": {
+        "position": [
+          15.01,
+          -1.01,
+          12.36
+        ],
+        "rotation_degrees": [
+          0,
+          193.3,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_28",
+      "transform": {
+        "position": [
+          -15.86,
+          -1.01,
+          9.59
+        ],
+        "rotation_degrees": [
+          0,
+          40.2,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_29",
+      "transform": {
+        "position": [
+          -4.44,
+          -1.01,
+          -3.15
+        ],
+        "rotation_degrees": [
+          0,
+          343.4,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_30",
+      "transform": {
+        "position": [
+          0.04,
+          -1.01,
+          -21.85
+        ],
+        "rotation_degrees": [
+          0,
+          328.5,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_31",
+      "transform": {
+        "position": [
+          -23.61,
+          -1.01,
+          17.85
+        ],
+        "rotation_degrees": [
+          0,
+          194.2,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_32",
+      "transform": {
+        "position": [
+          -33.96,
+          -1.01,
+          -11.96
+        ],
+        "rotation_degrees": [
+          0,
+          7.0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_33",
+      "transform": {
+        "position": [
+          -30.06,
+          -1.01,
+          25.7
+        ],
+        "rotation_degrees": [
+          0,
+          340.9,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_34",
+      "transform": {
+        "position": [
+          -28.18,
+          -1.01,
+          -0.95
+        ],
+        "rotation_degrees": [
+          0,
+          24.9,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_35",
+      "transform": {
+        "position": [
+          17.72,
+          -1.01,
+          18.08
+        ],
+        "rotation_degrees": [
+          0,
+          46.2,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_36",
+      "transform": {
+        "position": [
+          -1.68,
+          -1.01,
+          3.39
+        ],
+        "rotation_degrees": [
+          0,
+          95.4,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_37",
+      "transform": {
+        "position": [
+          -19.6,
+          -1.01,
+          2.67
+        ],
+        "rotation_degrees": [
+          0,
+          262.8,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_38",
+      "transform": {
+        "position": [
+          -25.77,
+          -1.01,
+          -18.72
+        ],
+        "rotation_degrees": [
+          0,
+          121.7,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "Tree_39",
+      "transform": {
+        "position": [
+          8.92,
+          -1.01,
+          -18.43
+        ],
+        "rotation_degrees": [
+          0,
+          326.0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mesh": {
+        "asset": "meshes/tree_1.glb",
+        "color": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "physics": {
+        "body": "static",
+        "shape": "box",
+        "friction": 0.8,
+        "half_extents": [
+          0.45,
+          1.25,
+          0.45
+        ]
       }
     }
   ]
