@@ -12,4 +12,9 @@ add_sample_app(Tutorial02_Cube
     SHADERS
         assets/cube.vsh
         assets/cube.psh
+    ASSETS
+        assets/config/camera.json
+        assets/config/input_bindings.json
 )
+
+target_link_libraries(Tutorial02_Cube PRIVATE SapanaEngine)

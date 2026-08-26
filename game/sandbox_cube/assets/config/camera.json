@@ -1,0 +1,8 @@
+{
+  "move_speed": 4.0,
+  "look_sensitivity": 0.003,
+  "fov_y_degrees": 45.0,
+  "near_plane": 0.1,
+  "far_plane": 100.0,
+  "pitch_limit_degrees": 89.0
+}

@@ -1,0 +1,10 @@
+{
+  "MoveForward":  ["Diligent.MoveForward"],
+  "MoveBackward": ["Diligent.MoveBackward"],
+  "MoveLeft":     ["Diligent.MoveLeft"],
+  "MoveRight":    ["Diligent.MoveRight"],
+  "MoveUp":       ["Diligent.MoveUp"],
+  "MoveDown":     ["Diligent.MoveDown"],
+  "Look":         ["Mouse.Delta"],
+  "ToggleCursor": ["Key.M"]
+}

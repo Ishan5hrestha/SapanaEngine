@@ -29,6 +29,8 @@
 #include "MapHelper.hpp"
 #include "GraphicsUtilities.h"
 #include "ColorConversion.h"
+#include "sapana/camera/CameraConfig.hpp"
+#include "imgui.h"
 
 namespace Diligent
 {
@@ -231,6 +233,26 @@ void Tutorial02_Cube::Initialize(const SampleInitInfo& InitInfo)
     CreatePipelineState();
     CreateVertexBuffer();
     CreateIndexBuffer();
+
+    const bool isOpenGL = m_pDevice->GetDeviceInfo().NDC.MinZ == -1;
+
+    sapana::camera::CameraConfig cameraConfig;
+    if (!cameraConfig.LoadFromFile("config/camera.json"))
+    {
+        // Keep built-in defaults when config is missing (e.g. wrong CWD).
+    }
+    m_Camera.ApplyConfig(cameraConfig);
+    m_Camera.SetPerspective(cameraConfig.FovYDegrees * (PI_F / 180.f), cameraConfig.NearPlane, cameraConfig.FarPlane, isOpenGL);
+
+    if (!m_InputSystem.LoadBindings("config/input_bindings.json"))
+    {
+        // Defaults already installed by InputBindings.
+    }
+
+    m_CursorController.Initialize();
+    m_CursorController.SetMode(sapana::input::CursorMode::Captured);
+    // Avoid a one-frame look spike from wherever the OS cursor was on startup.
+    m_InputSystem.SuppressLookFrames(1);
 }
 
 // Render a frame
@@ -277,20 +299,63 @@ void Tutorial02_Cube::Render()
 void Tutorial02_Cube::Update(double CurrTime, double ElapsedTime, bool DoUpdateUI)
 {
     SampleBase::Update(CurrTime, ElapsedTime, DoUpdateUI);
+    (void)CurrTime;
 
-    // Apply rotation
-    float4x4 CubeModelTransform = float4x4::RotationY(static_cast<float>(CurrTime) * 1.0f) * float4x4::RotationX(-PI_F * 0.1f);
+    const auto& SCDesc  = m_pSwapChain->GetDesc();
+    const int   centerX = static_cast<int>(SCDesc.Width / 2);
+    const int   centerY = static_cast<int>(SCDesc.Height / 2);
 
-    // Camera is at (0, 0, -5) looking along the Z axis
-    float4x4 View = float4x4::Translation(0.f, 0.0f, 5.0f);
+    ImGuiIO* io = ImGui::GetCurrentContext() != nullptr ? &ImGui::GetIO() : nullptr;
+    m_InputSystem.Update(GetInputController(), io);
 
-    // Get pretransform matrix that rotates the scene according the surface orientation
-    float4x4 SrfPreTransform = GetSurfacePretransformMatrix(float3{0, 0, 1});
+    if (m_InputSystem.WasPressed(sapana::input::Action::ToggleCursor))
+    {
+        m_CursorController.Toggle();
+        if (m_CursorController.IsCaptured())
+        {
+            m_CursorController.WarpPointer(centerX, centerY);
+            m_InputSystem.NotifyPointerWarped();
+            m_InputSystem.SuppressLookFrames(1);
+        }
+    }
 
-    // Get projection matrix adjusted to the current screen orientation
-    float4x4 Proj = GetAdjustedProjectionMatrix(PI_F / 4.0f, 0.1f, 100.f);
+    if (m_CursorController.IsCaptured())
+    {
+        float3 moveDir{0.f, 0.f, 0.f};
+        if (m_InputSystem.IsDown(sapana::input::Action::MoveForward))
+            moveDir.z += 1.f;
+        if (m_InputSystem.IsDown(sapana::input::Action::MoveBackward))
+            moveDir.z -= 1.f;
+        if (m_InputSystem.IsDown(sapana::input::Action::MoveRight))
+            moveDir.x += 1.f;
+        if (m_InputSystem.IsDown(sapana::input::Action::MoveLeft))
+            moveDir.x -= 1.f;
+        if (m_InputSystem.IsDown(sapana::input::Action::MoveUp))
+            moveDir.y += 1.f;
+        if (m_InputSystem.IsDown(sapana::input::Action::MoveDown))
+            moveDir.y -= 1.f;
+        m_Camera.Move(moveDir, static_cast<float>(ElapsedTime));
 
-    // Compute world-view-projection matrix
+        const auto look = m_InputSystem.GetLookDelta();
+        m_Camera.LookPixels(look.x, look.y);
+
+        // Keep pointer near center for infinite free-look. Look itself stays
+        // frame-to-frame; the next Update absorbs the warp landing (no drift).
+        if (look.x != 0.f || look.y != 0.f)
+        {
+            m_CursorController.WarpPointer(centerX, centerY);
+            m_InputSystem.NotifyPointerWarped();
+        }
+    }
+
+    // Static cube; view comes from the camera
+    const float4x4 CubeModelTransform = float4x4::Identity();
+    const float4x4 View               = m_Camera.GetViewMatrix();
+    const float4x4 SrfPreTransform    = GetSurfacePretransformMatrix(float3{0, 0, 1});
+
+    const float    aspect = static_cast<float>(SCDesc.Width) / static_cast<float>(SCDesc.Height);
+    const float4x4 Proj   = m_Camera.GetProjectionMatrix(aspect);
+
     m_WorldViewProjMatrix = CubeModelTransform * View * SrfPreTransform * Proj;
 }
 

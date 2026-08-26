@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- *  In no event and under no legal theory, whether in tort (including negligence),
+ *  In no event and under any legal theory, whether in tort (including negligence),
  *  contract, or otherwise, unless required by applicable law (such as deliberate
  *  and grossly negligent acts) or agreed to in writing, shall any Contributor be
  *  liable for any damages, including any direct, indirect, special, incidental,
@@ -29,6 +29,9 @@
 
 #include "SampleBase.hpp"
 #include "BasicMath.hpp"
+#include "sapana/camera/Camera.hpp"
+#include "sapana/input/CursorController.hpp"
+#include "sapana/input/InputSystem.hpp"
 
 namespace Diligent
 {
@@ -54,6 +57,10 @@ private:
     RefCntAutoPtr<IBuffer>                m_CubeIndexBuffer;
     RefCntAutoPtr<IBuffer>                m_VSConstants;
     float4x4                              m_WorldViewProjMatrix;
+
+    sapana::camera::Camera             m_Camera;
+    sapana::input::InputSystem         m_InputSystem;
+    sapana::input::CursorController    m_CursorController;
 };
 
 } // namespace Diligent
